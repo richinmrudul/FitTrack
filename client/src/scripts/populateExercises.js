@@ -1,7 +1,6 @@
 // client/src/scripts/populateExercises.js
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, query, where, getDocs } from 'firebase/firestore'; // <-- Add query, where, getDocs
 import { db } from '../firebase';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 // The exercises to be added
 const initialExercises = [
@@ -24,29 +23,34 @@ const initialExercises = [
   { name: 'Cycling', category: 'cardio' },
 ];
 
-// This function will add the data to Firestore
-export const populateExercises = async () => {
-    const auth = getAuth();
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            console.log("Adding exercises to Firestore for user:", user.uid);
-            for (const exercise of initialExercises) {
-                try {
-                    await addDoc(collection(db, 'exercises'), {
-                        userId: user.uid,
-                        name: exercise.name,
-                        category: exercise.category,
-                    });
-                    console.log(`Added ${exercise.name} to Firestore.`);
-                } catch (e) {
-                    console.error(`Error adding ${exercise.name}:`, e);
-                }
-            }
-            console.log("All initial exercises added!");
-        } else {
-            console.error("No user signed in. Please sign in to run the script.");
-        }
-    });
-};
+// This function will add the data to Firestore for a given user
+export const populateExercises = async (user) => {
+    if (!user) {
+        console.error("No user provided. Cannot run script.");
+        return;
+    }
 
-populateExercises();   
+    console.log("Checking for existing exercises...");
+    const q = query(collection(db, 'exercises'), where('userId', '==', user.uid));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+        console.log("Exercises already exist for this user. Skipping population.");
+        return;
+    }
+
+    console.log("Adding exercises to Firestore for user:", user.uid);
+    for (const exercise of initialExercises) {
+        try {
+            await addDoc(collection(db, 'exercises'), {
+                userId: user.uid,
+                name: exercise.name,
+                category: exercise.category,
+            });
+            console.log(`Added ${exercise.name} to Firestore.`);
+        } catch (e) {
+            console.error(`Error adding ${exercise.name}:`, e);
+        }
+    }
+    console.log("All initial exercises added!");
+};

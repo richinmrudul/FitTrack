@@ -1,28 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { onAuthStateChanged, signOut } from 'firebase/auth'; // <-- Corrected import
+import { collection, query, where, getDoc, getDocs, setDoc, doc } from 'firebase/firestore'; // <-- Corrected import
 
 import { auth, db } from './firebase';
 
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
-import WorkoutLogger from './components/WorkoutLogger'; // Renamed from WorkoutForm
+import WorkoutLogger from './components/WorkoutLogger';
 import ProfilePage from './components/ProfilePage';
 import HistoryPage from './components/HistoryPage';
 import RecordsPage from './components/RecordsPage';
 import ExercisesPage from './components/ExercisesPage';
 import StatisticsPage from './components/StatisticsPage';
-import WorkoutSplitPage from './components/WorkoutSplitPage'; // Keep this import if you plan to use this component later
+import WorkoutSplitPage from './components/WorkoutSplitPage';
 import SplitList from './components/SplitList';
 import SplitForm from './components/SplitForm';
 
 import { MdArrowBack } from 'react-icons/md';
 import './App.css';
 
-// Import the script for populating exercises
-import { populateExercises } from './scripts/populateExercises'; 
-
-const NavBar = ({ currentPage, onGoBack }) => { // Removed onSignOut prop, as it's no longer used in NavBar
+// A simple header with navigation links
+const NavBar = ({ currentPage, onGoBack }) => {
   const showBackButton = currentPage !== 'home';
 
   return (
@@ -35,19 +33,106 @@ const NavBar = ({ currentPage, onGoBack }) => { // Removed onSignOut prop, as it
         <div style={{ width: '50px' }}></div>
       )}
       <h1 className="app-title">FitTrack</h1>
-      {/* Sign Out button removed from NavBar, now only on Profile page */}
-      <div style={{ width: '50px' }}></div> {/* Spacer for alignment */}
+      <div style={{ width: '50px' }}></div>
     </nav>
   );
 };
+
+// New Onboarding Form component
+const OnboardingForm = ({ user, onFinishOnboarding }) => {
+    const [heightFt, setHeightFt] = useState(''); // <-- Added useState
+    const [heightIn, setHeightIn] = useState(''); // <-- Added useState
+    const [weight, setWeight] = useState('');
+    const [age, setAge] = useState('');
+    const [gender, setGender] = useState('male');
+    const [frequency, setFrequency] = useState('3');
+    const [goal, setGoal] = useState('lose-fat');
+    const [loading, setLoading] = useState(false);
+
+    const handleSaveProfile = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        // Convert height from ft/in to cm for consistent storage
+        const totalInches = (parseInt(heightFt) * 12) + parseInt(heightIn);
+        const heightInCm = totalInches * 2.54;
+
+        try {
+            await setDoc(doc(db, "users", user.uid), {
+                userId: user.uid,
+                name: user.displayName,
+                email: user.email,
+                photoURL: user.photoURL,
+                height: parseFloat(heightInCm.toFixed(2)),
+                weight: parseFloat(weight),
+                age: parseInt(age),
+                gender: gender,
+                workoutFrequency: parseInt(frequency),
+                goal: goal,
+                onboarded: true,
+            });
+            onFinishOnboarding();
+        } catch (error) {
+            console.error("Error saving profile data:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="card" style={{ maxWidth: '600px', margin: '20px auto' }}>
+            <h2>Welcome to FitTrack!</h2>
+            <p>Please tell us a little about yourself to get started.</p>
+            <form onSubmit={handleSaveProfile} className="form-layout" style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '20px' }}>
+                <label>
+                    Height:
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                        <input type="number" value={heightFt} onChange={(e) => setHeightFt(e.target.value)} placeholder="feet" required style={{ flex: 1 }} />
+                        <input type="number" value={heightIn} onChange={(e) => setHeightIn(e.target.value)} placeholder="inches" required style={{ flex: 1 }} />
+                    </div>
+                </label>
+                <label>
+                    Weight (lbs):
+                    <input type="number" value={weight} onChange={(e) => setWeight(e.target.value)} required />
+                </label>
+                <label>
+                    Age:
+                    <input type="number" value={age} onChange={(e) => setAge(e.target.value)} required />
+                </label>
+                <label>
+                    Gender:
+                    <select value={gender} onChange={(e) => setGender(e.target.value)} required>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                </label>
+                <label>
+                    Workout Frequency (per week):
+                    <input type="number" value={frequency} onChange={(e) => setFrequency(e.target.value)} required />
+                </label>
+                <label>
+                    Goal:
+                    <select value={goal} onChange={(e) => setGoal(e.target.value)} required>
+                        <option value="lose-fat">Lose Fat</option>
+                        <option value="build-muscle">Build Muscle</option>
+                        <option value="maintain">Maintain</option>
+                    </select>
+                </label>
+                <button type="submit" disabled={loading}>{loading ? 'Saving...' : 'Get Started'}</button>
+            </form>
+        </div>
+    );
+};
+
 
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState('home');
   const [selectedSplit, setSelectedSplit] = useState(null);
+  const [isOnboarded, setIsOnboarded] = useState(true);
 
-  // Track authentication state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -56,11 +141,24 @@ function App() {
     return () => unsubscribe();
   }, []);
 
-  // Fetch selected split from Firestore
+  useEffect(() => {
+      const checkOnboardingStatus = async () => {
+          if (user) {
+              const docRef = doc(db, "users", user.uid);
+              const docSnap = await getDoc(docRef);
+              if (docSnap.exists()) {
+                  setIsOnboarded(docSnap.data().onboarded);
+              } else {
+                  setIsOnboarded(false);
+              }
+          }
+      };
+      checkOnboardingStatus();
+  }, [user]);
+
   useEffect(() => {
     const fetchSelectedSplit = async () => {
       if (user) {
-        // Query to get the selected split for the current user
         const q = query(
           collection(db, 'splits'),
           where('userId', '==', user.uid),
@@ -75,7 +173,6 @@ function App() {
               ...querySnapshot.docs[0].data(),
             };
 
-            // Ensure 'days' field exists and is not empty
             if (selected.days && selected.days.length > 0) {
               setSelectedSplit(selected);
             } else {
@@ -102,8 +199,6 @@ function App() {
 
   const handleSignOut = async () => {
     try {
-      // Call populateExercises here temporarily to run it once
-      // await populateExercises(); // UNCOMMENT THIS LINE TO RUN THE SCRIPT ONCE
       await signOut(auth);
       console.log('User signed out successfully!');
       setCurrentPage('home');
@@ -143,6 +238,14 @@ function App() {
         <Login />
       </div>
     );
+  }
+
+  if (!isOnboarded) {
+      return (
+          <div className="App">
+              <OnboardingForm user={user} onFinishOnboarding={() => setIsOnboarded(true)} />
+          </div>
+      );
   }
 
   const renderPage = () => {
@@ -186,7 +289,7 @@ function App() {
         <NavBar
           currentPage={currentPage}
           onGoBack={handleGoBack}
-          // onSignOut is no longer passed to NavBar
+          onSignOut={handleSignOut}
         />
       </header>
       <main className="main-content">

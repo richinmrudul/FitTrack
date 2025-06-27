@@ -5,7 +5,7 @@
 */
 :root {
   --color-background-dark: #121212; /* Midnight black background */
-  --color-card-dark: #1e1e1e;      /* Slightly lighter black for cards, for contrast */
+  --color-card-dark: #121212;      /* Same as background for a flat look */
   --color-text-light: #f0f0f0;     /* Off-white text */
   --color-highlight-subtle: #999;  /* Subtle gray highlight */
   --color-border-subtle: #333;     /* Dark gray border */
@@ -50,7 +50,7 @@ html, body, #root {
 .main-content {
   flex-grow: 1 !important;
   width: 100% !important;
-  max-width: 100% !important; /* Ensure it takes full width */
+  max-width: 100% !important;
   padding: 20px !important;
   box-sizing: border-box !important;
   overflow-y: auto !important;
@@ -88,7 +88,7 @@ select {
   padding: 12px;
   margin-top: 5px;
   border: 1px solid var(--color-border-subtle);
-  background-color: var(--color-card-dark);
+  background-color: var(--color-background-dark); /* Removed card background */
   color: var(--color-text-light);
   border-radius: 8px;
   box-sizing: border-box;
@@ -97,14 +97,14 @@ select {
 
 /* Cards/Sections */
 .card {
-  background-color: var(--color-card-dark);
-  border: 1px solid var(--color-border-subtle);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  background-color: var(--color-background-dark); /* Removed card background */
+  border: none;
+  box-shadow: none;
   padding: 20px;
-  border-radius: 16px;
+  border-radius: 0;
   text-align: left;
   margin-bottom: 20px;
-  transition: transform 0.2s;
+  transition: none;
 }
 
 .card.highlight-border {
@@ -123,7 +123,8 @@ select {
 }
 
 .grid-item {
-  background-color: var(--color-card-dark);
+  background-color: var(--color-background-dark); /* Removed card background */
+  border: 1px solid var(--color-border-subtle); /* Added back a subtle border */
   padding: 25px;
   border-radius: 16px;
   display: flex;
@@ -134,7 +135,7 @@ select {
   min-height: 120px;
   font-weight: bold;
   transition: transform 0.2s;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  box-shadow: none;
 }
 
 .grid-item:hover {
@@ -160,7 +161,7 @@ select {
 }
 
 .split-day-item {
-    background-color: var(--color-card-dark);
+    background-color: var(--color-background-dark);
     border: 1px solid var(--color-border-subtle);
     border-radius: 16px;
     padding: 15px 20px;
@@ -233,7 +234,7 @@ select {
 }
 
 .split-list-item {
-    background-color: var(--color-card-dark);
+    background-color: var(--color-background-dark);
     border: 1px solid var(--color-border-subtle);
     border-radius: 16px;
     padding: 20px;
@@ -244,7 +245,7 @@ select {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    box-shadow: none; /* No shadow on the list items */
 }
 
 .split-list-item:hover {
