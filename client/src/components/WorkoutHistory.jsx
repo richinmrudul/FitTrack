@@ -52,12 +52,19 @@ const WorkoutHistory = () => {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {workouts.map((workout) => (
-            <div key={workout.id} style={{ border: '1px solid var(--color-border-subtle)', padding: '15px', borderRadius: '8px', textAlign: 'left' }}>
+            <div key={workout.id} className="card" style={{ border: '1px solid var(--color-border-subtle)', padding: '15px', borderRadius: '8px', textAlign: 'left' }}>
               <h4>Workout on {new Date(workout.date.toDate()).toLocaleDateString()}</h4>
               <ul style={{ listStyleType: 'none', padding: 0 }}>
                 {workout.exercises.map((ex, index) => (
                   <li key={index} style={{ marginBottom: '5px' }}>
-                    - {ex.name}: {ex.sets} sets x {ex.reps} reps @ {ex.weight} kg
+                    - {ex.name}: {ex.sets?.length || 0} sets
+                    <ul style={{ listStyleType: 'none', paddingLeft: '20px' }}>
+                      {ex.sets?.map((set, setIndex) => (
+                        <li key={setIndex}>
+                            Weight: {set.weight} lbs, Reps: {set.reps} {/* <-- Changed 'kg' to 'lbs' */}
+                        </li>
+                      ))}
+                    </ul>
                   </li>
                 ))}
               </ul>

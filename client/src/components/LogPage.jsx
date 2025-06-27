@@ -1,5 +1,5 @@
 import React from 'react';
-import WorkoutForm from './WorkoutForm';
+import WorkoutForm from './WorkoutLogger';
 
 const LogPage = ({ user }) => {
   return (

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { collection, query, where, onSnapshot, doc, deleteDoc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc, updateDoc, deleteDoc, writeBatch } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { MdOutlineAdd, MdEdit, MdDelete, MdCheck } from 'react-icons/md';
 import DayModal from './DayModal';
@@ -8,7 +8,6 @@ const SplitList = ({ onSetPage, onSelectSplit }) => {
   const [splits, setSplits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedSplitId, setSelectedSplitId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDayIndex, setSelectedDayIndex] = useState(null);
   const [splitToEdit, setSplitToEdit] = useState(null);
@@ -41,6 +40,9 @@ const SplitList = ({ onSetPage, onSelectSplit }) => {
     return () => unsubscribe();
   }, []);
 
+  // Sort splits to put the selected one at the top
+  const sortedSplits = splits.sort((a, b) => (b.selected - a.selected));
+
   if (loading) {
     return <p>Loading splits...</p>;
   }
@@ -67,8 +69,23 @@ const SplitList = ({ onSetPage, onSelectSplit }) => {
     }
   };
 
-  const handleSelectSplit = (splitId) => {
-      setSelectedSplitId(splitId);
+  const handleSelectSplit = async (selectedId) => {
+    const batch = writeBatch(db);
+
+    splits.forEach(split => {
+        const splitRef = doc(db, 'splits', split.id);
+        if (split.id === selectedId) {
+            batch.update(splitRef, { selected: true });
+        } else if (split.selected) {
+            batch.update(splitRef, { selected: false });
+        }
+    });
+
+    try {
+        await batch.commit();
+    } catch (e) {
+        console.error("Error selecting split:", e);
+    }
   };
 
   const handleSaveDay = async (updatedDay) => {
@@ -112,15 +129,21 @@ const SplitList = ({ onSetPage, onSelectSplit }) => {
         </button>
       </div>
 
-      {splits.length === 0 ? (
+      {sortedSplits.length === 0 ? (
         <p>No splits saved yet. Create your first split!</p>
       ) : (
         <div className="split-list-container">
-          {splits.map((split) => (
-            <div key={split.id} className="split-list-item" onClick={() => handleSelectSplit(split.id)}>
+          {sortedSplits.map((split) => (
+            <div key={split.id} className="split-list-item">
               <div className="split-list-header">
                 <h4>{split.name || 'Untitled Split'}</h4>
-                {selectedSplitId === split.id && <span className="selected-badge">Selected</span>}
+                {split.selected ? (
+                    <span className="selected-badge">Selected</span>
+                ) : (
+                    <button onClick={(e) => { e.stopPropagation(); handleSelectSplit(split.id); }} style={{ position: 'absolute', top: '15px', right: '15px', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-primary-neon)', fontSize: '24px' }}>
+                        <MdCheck />
+                    </button>
+                )}
               </div>
               <p>{split.days.length} workout days</p>
 
@@ -138,8 +161,8 @@ const SplitList = ({ onSetPage, onSelectSplit }) => {
                 ))}
               </div>
 
-              {/* Single Edit/Delete buttons at the bottom of the card */}
-              <div className="split-list-actions" style={{ position: 'static', marginTop: '15px' }}>
+              {/* Top-level split buttons */}
+              <div className="split-list-actions" style={{ position: 'static', marginTop: '15px', display: 'flex', gap: '10px' }}>
                   <button onClick={(e) => { e.stopPropagation(); handleEditSplit(split); }} style={{ width: '100%' }}><MdEdit /> Edit Split</button>
                   <button onClick={(e) => { e.stopPropagation(); handleDeleteSplit(split.id); }} style={{ width: '100%', border: '2px solid var(--color-secondary-red)', color: 'var(--color-secondary-red)' }}><MdDelete /> Delete Split</button>
               </div>
