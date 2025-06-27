@@ -4,13 +4,13 @@
   =================================
 */
 :root {
-  --color-background-dark: #121212;
-  --color-card-dark: #1e1e1e;
-  --color-text-light: #f0f0f0;
-  --color-highlight-subtle: #999;
-  --color-border-subtle: #333;
-  --color-primary-neon: #4A4AFF;
-  --color-secondary-red: #ff3b30;
+  --color-background-dark: #121212; /* Midnight black background */
+  --color-card-dark: #1e1e1e;      /* Slightly lighter black for cards, for contrast */
+  --color-text-light: #f0f0f0;     /* Off-white text */
+  --color-highlight-subtle: #999;  /* Subtle gray highlight */
+  --color-border-subtle: #333;     /* Dark gray border */
+  --color-primary-neon: #4A4AFF;    /* Neon Navy Blue highlight */
+  --color-secondary-red: #ff3b30;   /* A secondary accent color (for delete) */
 }
 
 /* Reset some basic browser styles */
@@ -45,10 +45,12 @@ html, body, #root {
   width: 100vw !important;
 }
 
+/* Removed specific max-width from .main-content to allow full width,
+   padding will keep content from touching edges */
 .main-content {
   flex-grow: 1 !important;
   width: 100% !important;
-  max-width: 100% !important;
+  max-width: 100% !important; /* Ensure it takes full width */
   padding: 20px !important;
   box-sizing: border-box !important;
   overflow-y: auto !important;
@@ -356,4 +358,132 @@ select {
     font-size: 6rem;
     font-weight: bold;
     color: var(--color-primary-neon);
+}
+
+/* New class for the calendar container */
+.calendar-card {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 0;
+}
+
+/*
+  =================================
+  Final Calendar Styles (Override)
+  =================================
+*/
+.react-calendar {
+    background-color: var(--color-card-dark) !important;
+    color: var(--color-text-light) !important;
+    border: none !important;
+    border-radius: 16px !important;
+    font-family: inherit !important;
+    width: 100% !important;
+    max-width: 550px !important;
+    margin: 20px auto !important;
+}
+
+/* Navigation controls (arrows) */
+.react-calendar__navigation button {
+    color: var(--color-text-light) !important;
+    background: none !important;
+    border: none !important;
+    font-size: 1.2em !important;
+    font-weight: bold !important;
+    opacity: 0.7 !important;
+    transition: opacity 0.3s ease !important;
+}
+
+.react-calendar__navigation button:hover {
+    opacity: 1 !important;
+    color: var(--color-primary-neon) !important;
+}
+
+/* Navigation label (current month and year) */
+.react-calendar__navigation__label__labelText {
+    color: var(--color-text-light) !important;
+    font-weight: bold !important;
+    font-size: 1.1em !important;
+}
+
+.react-calendar__navigation__label:hover__labelText {
+    color: var(--color-primary-neon) !important;
+    cursor: pointer !important;
+}
+
+/* Weekday names (Sun, Mon, etc.) */
+.react-calendar__month-view__weekdays__weekday {
+    color: var(--color-highlight-subtle) !important;
+    font-size: 0.9em !important;
+    font-weight: normal !important;
+}
+
+/* Day numbers */
+.react-calendar__month-view__days__day {
+    color: var(--color-text-light) !important;
+    font-size: 1em !important;
+    padding: 0.8em 0.5em !important;
+    border-radius: 8px !important;
+    transition: background-color 0.2s ease !important;
+}
+
+.react-calendar__month-view__days__day:hover {
+    background-color: #2b2b2b !important;
+    cursor: pointer !important;
+}
+
+/* Day numbers of the previous/next month */
+.react-calendar__month-view__days__day--neighboringMonth {
+    color: var(--color-border-subtle) !important;
+}
+
+/* Weekend days (if any) */
+.react-calendar__month-view__days__day--weekend {
+    /* You can add specific weekend styling here if needed */
+}
+
+/* Today's date */
+.react-calendar__tile--now {
+    background: rgba(var(--color-primary-neon), 0.3) !important;
+    color: var(--color-text-light) !important;
+    font-weight: bold !important;
+}
+
+.react-calendar__tile--now:hover {
+    background: rgba(var(--color-primary-neon), 0.5) !important;
+}
+
+/* Active date (when a day is clicked) */
+.react-calendar__tile--active {
+    background-color: var(--color-primary-neon) !important;
+    color: var(--color-background-dark) !important;
+    font-weight: bold !important;
+}
+
+.react-calendar__tile--active:hover {
+    background-color: var(--color-primary-neon) !important;
+}
+
+/* Style for the workout day indicator dot */
+.workout-day-dot {
+    position: absolute !important;
+    bottom: 0.2em !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    height: 0.5em !important;
+    width: 0.5em !important;
+    border-radius: 50% !important;
+    background-color: var(--color-primary-neon) !important;
+}
+
+/* Ensure the dot doesn't interfere with day number */
+.react-calendar__month-view__days__day--hasActive {
+    padding-bottom: 1.2em !important;
+}
+
+/* Style for disabled days (if any) */
+.react-calendar__tile:disabled {
+    background-color: var(--color-background-dark) !important;
+    color: var(--color-border-subtle) !important;
+    cursor: not-allowed !important;
 }
