@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { onAuthStateChanged, signOut } from 'firebase/auth'; // <-- ADD signOut here
-import { auth } from './firebase'; // Import the auth instance
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { auth, db } from './firebase'; // Ensure 'db' is also imported
 import Login from './components/Login';
+import WorkoutForm from './components/WorkoutForm';
+import WorkoutHistory from './components/WorkoutHistory'; // <-- Add this import
 
-// ... imports at the top
-
-// Updated Dashboard component with a sign-out button
+// Updated Dashboard component with a sign-out button, WorkoutForm, and WorkoutHistory
 const Dashboard = ({ onSignOut }) => {
   return (
     <div style={{ textAlign: 'center', padding: '20px' }}>
@@ -14,11 +14,11 @@ const Dashboard = ({ onSignOut }) => {
       <button onClick={onSignOut} style={{ marginTop: '20px', padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}>
         Sign Out
       </button>
+      <WorkoutForm />
+      <WorkoutHistory /> {/* <-- Add the WorkoutHistory component here */}
     </div>
   );
 };
-
-// ... rest of the App component code below
 
 function App() {
   const [user, setUser] = useState(null);
@@ -27,12 +27,16 @@ function App() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
+        // User is signed in
         setUser(currentUser);
       } else {
+        // User is signed out
         setUser(null);
       }
       setLoading(false);
     });
+
+    // Clean up the subscription on unmount
     return () => unsubscribe();
   }, []);
 
@@ -51,6 +55,7 @@ function App() {
 
   return (
     <div className="App">
+      {/* The App-header class from App.css will handle centering for its content */}
       <header className="App-header">
         {user ? <Dashboard onSignOut={handleSignOut} /> : <Login />}
       </header>
