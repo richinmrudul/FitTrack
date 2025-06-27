@@ -1,11 +1,11 @@
 import React from 'react';
 import WorkoutHistory from './WorkoutHistory';
 
-const HistoryPage = ({ user }) => {
+const HistoryPage = () => {
   return (
     <div style={{ padding: '20px' }}>
       <h2>Full Workout History</h2>
-      <WorkoutHistory user={user} />
+      <WorkoutHistory />
     </div>
   );
 };

@@ -1,8 +1,8 @@
 import React from 'react';
-import { GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth'; // <-- Add signOut
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '../firebase';
 
-const Login = ({ onSignOut }) => { // <-- Accept a prop for sign out
+const Login = () => {
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     try {
@@ -13,20 +13,10 @@ const Login = ({ onSignOut }) => { // <-- Accept a prop for sign out
     }
   };
 
-  const handleSignOut = async () => {
-    try {
-      await signOut(auth);
-      console.log("User signed out successfully!");
-      if (onSignOut) onSignOut(); // Optional callback
-    } catch (error) {
-      console.error("Error during sign out:", error.message);
-    }
-  };
-
   return (
-    <div style={{ padding: '20px', textAlign: 'center' }}>
+    <div>
       <h2>Sign in to FitTrack</h2>
-      <button onClick={signInWithGoogle} style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}>
+      <button onClick={signInWithGoogle}>
         Sign in with Google
       </button>
     </div>

@@ -1,41 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from './firebase';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+// Removed BrowserRouter, Routes, Route, Link as we are no longer using react-router-dom for page switching
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
-import BottomNav from './components/BottomNav';
+import WorkoutForm from './components/WorkoutForm';
+import ProfilePage from './components/ProfilePage';
+import HistoryPage from './components/HistoryPage';
+import RecordsPage from './components/RecordsPage';
+import ExercisesPage from './components/ExercisesPage';
+import StatisticsPage from './components/StatisticsPage';
+import WorkoutSplitPage from './components/WorkoutSplitPage'; // <-- Import the new WorkoutSplitPage
 
-// Import the new page components from their files
-import HistoryPage from './components/HistoryPage'; // <-- Import from file
-import LogPage from './components/LogPage';         // <-- Import from file
-import ProfilePage from './components/ProfilePage'; // <-- Import from file
-
-import './App.css'; 
-
-// A simple header with navigation links (we'll replace this with a better UI later)
-const NavBar = ({ onSignOut }) => {
-    return (
-        <nav style={{ padding: '20px', borderBottom: '1px solid #444', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Link to="/" style={{ color: 'white', textDecoration: 'none', fontSize: '24px', fontWeight: 'bold' }}>FitTrack</Link>
-            <div>
-                <button onClick={onSignOut} style={{ padding: '8px 15px', fontSize: '14px', cursor: 'pointer' }}>
-                    Sign Out
-                </button>
-            </div>
-        </nav>
-    );
-};
-
-// Remove these placeholder component definitions as they are now in separate files
-// const HistoryPage = () => <div>History Page Content</div>;
-// const ProfilePage = () => <div>Profile Page Content</div>;
-// const LogPage = () => <div>Log Page Content</div>;
-
+import './App.css';
 
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState('home');
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -49,9 +31,18 @@ function App() {
     try {
       await signOut(auth);
       console.log("User signed out successfully!");
+      setCurrentPage('home');
     } catch (error) {
       console.error("Error during sign out:", error.message);
     }
+  };
+
+  const handleSetPage = (page) => {
+    setCurrentPage(page);
+  };
+
+  const handleGoBack = () => {
+    setCurrentPage('home');
   };
 
   if (loading) {
@@ -61,30 +52,54 @@ function App() {
   if (!user) {
     return (
       <div className="App">
-        <header className="App-header">
-          <Login />
-        </header>
+        <Login />
       </div>
     );
   }
 
-  // If the user is logged in, show the router and protected routes
+  // Conditionally render the current page
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'home':
+        return <Dashboard user={user} onSetPage={handleSetPage} />;
+      case 'log':
+        return <WorkoutForm />;
+      case 'history':
+        return <HistoryPage />;
+      case 'records':
+        return <RecordsPage />;
+      case 'exercises':
+        return <ExercisesPage />;
+      case 'statistics':
+        return <StatisticsPage />;
+      case 'split': // <-- New case for Workout Split page
+        return <WorkoutSplitPage />;
+      case 'profile':
+        return <ProfilePage user={user} onSignOut={handleSignOut} />;
+      default:
+        return <Dashboard user={user} onSetPage={handleSetPage} />;
+    }
+  };
+
+  const showBackButton = currentPage !== 'home';
+
   return (
-    <Router>
-        <div className="App" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-            <NavBar onSignOut={handleSignOut} />
-            <main style={{ flexGrow: 1, overflowY: 'auto', paddingBottom: '70px', width: '100%' }}>
-                <Routes>
-                    {/* Pass the user prop to the Dashboard and other pages */}
-                    <Route path="/" element={<Dashboard user={user} />} /> 
-                    <Route path="/history" element={<HistoryPage user={user} />} />
-                    <Route path="/log" element={<LogPage user={user} />} />
-                    <Route path="/profile" element={<ProfilePage user={user} onSignOut={handleSignOut} />} />
-                </Routes>
-            </main>
-            <BottomNav />
-        </div>
-    </Router>
+    <div className="App">
+      <header className="App-header" style={{ width: '100%' }}>
+        <nav style={{ padding: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', maxWidth: '900px', boxSizing: 'border-box' }}>
+          {showBackButton ? (
+              <button onClick={handleGoBack}>Back</button>
+          ) : (
+              <div style={{ width: '100px' }}></div> // Spacer for alignment
+          )}
+          <h1 style={{ margin: '0', fontSize: '24px' }}>FitTrack</h1>
+          <button onClick={handleSignOut}>Sign Out</button>
+        </nav>
+      </header>
+      <main className="main-content">
+        {renderPage()}
+      </main>
+    </div>
   );
 }
 

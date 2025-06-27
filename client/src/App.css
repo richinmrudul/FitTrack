@@ -1,14 +1,27 @@
-/* Reset some browser defaults */
+/*
+  =================================
+  Global Styles & Color Palette
+  =================================
+*/
+:root {
+  --color-background-dark: #121212; /* Midnight black background */
+  --color-card-dark: #1e1e1e;      /* Slightly lighter black for cards */
+  --color-text-light: #f0f0f0;     /* Off-white text */
+  --color-highlight-subtle: #999;  /* Subtle gray highlight */
+  --color-border-subtle: #333;     /* Dark gray border */
+  --color-primary-red: #ff3b30;    /* A vibrant red for accents */
+  --color-card-vibrant: #ff3b30;   /* A vibrant card color */
+}
+
+/* Reset some basic browser styles */
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Ensure the root HTML elements take up the full viewport height */
+/* Ensure root HTML elements take up full height */
 html, body, #root {
   height: 100%;
   margin: 0;
@@ -16,16 +29,113 @@ html, body, #root {
   box-sizing: border-box;
 }
 
-/* Style for the main app container */
+/* =================================
+  Main App Layout
+  =================================
+*/
 .App {
-  min-height: 100%; /* This will now take up the full viewport height */
-  background-color: #282c34;
-  color: white;
-
-  /* Use Flexbox to center all content */
+  min-height: 100vh;
+  background-color: var(--color-background-dark);
+  color: var(--color-text-light);
   display: flex;
   flex-direction: column;
-  align-items: center; /* Horizontally center content */
-  justify-content: center; /* Vertically center content */
+  align-items: center;
   text-align: center;
+  overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+.main-content {
+  flex-grow: 1;
+  width: 100%;
+  max-width: 900px;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+/* =================================
+  Component Styles
+  =================================
+*/
+/* Buttons */
+button {
+  padding: 12px 24px;
+  font-size: 16px;
+  cursor: pointer;
+  border: 2px solid var(--color-highlight-subtle);
+  background-color: transparent;
+  color: var(--color-text-light);
+  border-radius: 12px;
+  font-weight: bold;
+  transition: all 0.2s ease-in-out;
+}
+
+button:hover {
+  background-color: var(--color-highlight-subtle);
+  color: var(--color-background-dark);
+}
+
+/* Inputs */
+input[type="text"],
+input[type="number"],
+input[type="date"],
+select {
+  width: 100%;
+  padding: 12px;
+  margin-top: 5px;
+  border: 1px solid var(--color-border-subtle);
+  background-color: var(--color-card-dark);
+  color: var(--color-text-light);
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+/* Cards/Sections */
+.card {
+  background-color: var(--color-card-dark);
+  border: 1px solid var(--color-border-subtle);
+  padding: 20px;
+  border-radius: 16px;
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.card.highlight-border {
+  border-color: var(--color-highlight-subtle);
+}
+
+/* =================================
+  Layouts (Quick Actions, etc.)
+  =================================
+*/
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.grid-item {
+  background-color: var(--color-card-dark);
+  padding: 25px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  min-height: 120px;
+  font-weight: bold;
+  transition: transform 0.2s;
+}
+
+.grid-item:hover {
+  transform: translateY(-5px);
+}
+
+.grid-item .icon {
+  font-size: 40px;
+  color: var(--color-highlight-subtle);
+  margin-bottom: 10px;
 }
