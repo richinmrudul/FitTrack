@@ -3,9 +3,10 @@ import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth, db } from './firebase'; // Ensure 'db' is also imported
 import Login from './components/Login';
 import WorkoutForm from './components/WorkoutForm';
-import WorkoutHistory from './components/WorkoutHistory'; // <-- Add this import
+import WorkoutHistory from './components/WorkoutHistory';
+import ProgressCharts from './components/ProgressCharts'; // <-- Add this import
 
-// Updated Dashboard component with a sign-out button, WorkoutForm, and WorkoutHistory
+// Updated Dashboard component with a sign-out button, WorkoutForm, WorkoutHistory, and ProgressCharts
 const Dashboard = ({ onSignOut }) => {
   return (
     <div style={{ textAlign: 'center', padding: '20px' }}>
@@ -15,7 +16,8 @@ const Dashboard = ({ onSignOut }) => {
         Sign Out
       </button>
       <WorkoutForm />
-      <WorkoutHistory /> {/* <-- Add the WorkoutHistory component here */}
+      <WorkoutHistory />
+      <ProgressCharts /> {/* <-- Add the ProgressCharts component here */}
     </div>
   );
 };
