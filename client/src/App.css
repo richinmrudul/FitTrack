@@ -9,8 +9,8 @@
   --color-text-light: #f0f0f0;     /* Off-white text */
   --color-highlight-subtle: #999;  /* Subtle gray highlight */
   --color-border-subtle: #333;     /* Dark gray border */
-  --color-primary-red: #ff3b30;    /* A vibrant red for accents */
-  --color-card-vibrant: #ff3b30;   /* A vibrant card color */
+  --color-primary-neon: #4A4AFF;    /* Neon Navy Blue highlight */
+  --color-secondary-red: #ff3b30;   /* A secondary accent color (for delete) */
 }
 
 /* Reset some basic browser styles */
@@ -41,7 +41,7 @@ html, body, #root {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  overflow-x: hidden; /* Prevent horizontal scroll */
+  overflow-x: hidden;
 }
 
 .main-content {
@@ -138,4 +138,162 @@ select {
   font-size: 40px;
   color: var(--color-highlight-subtle);
   margin-bottom: 10px;
+}
+
+/*
+  =================================
+  Split Day List Styles (for SplitForm.jsx)
+  =================================
+*/
+.split-day-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.split-day-item {
+    background-color: var(--color-card-dark);
+    border-radius: 16px;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.2s;
+    position: relative;
+}
+
+.split-day-item:hover {
+    transform: translateY(-3px);
+    background-color: #2b2b2b;
+}
+
+.day-number-circle {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background-color: var(--color-primary-neon); /* Changed to neon for consistency with mockup */
+    color: var(--color-background-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.split-day-item .day-content {
+    flex-grow: 1;
+    text-align: left;
+}
+
+.split-day-item .day-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.split-day-item .selected-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: var(--color-primary-neon); /* Neon color */
+  color: var(--color-background-dark);
+  font-size: 12px;
+  font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 16px;
+}
+
+.split-day-item .icon-button {
+    background: none;
+    border: none;
+    color: var(--color-text-light); /* Default icon color */
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/*
+  =================================
+  Split List Page Styles (for SplitList.jsx)
+  =================================
+*/
+.split-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.split-list-item {
+    background-color: var(--color-card-dark);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 16px;
+    padding: 20px;
+    position: relative;
+    text-align: left;
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s;
+    display: flex; /* Added flex for list item layout */
+    align-items: center;
+    gap: 20px;
+}
+
+.split-list-item:hover {
+    transform: translateY(-3px);
+    border-color: var(--color-highlight-subtle);
+}
+
+.split-list-header {
+    flex-grow: 1; /* Allow header to take available space */
+}
+
+.split-list-actions {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0; /* Prevent actions from shrinking */
+}
+
+.split-day-list-in-list {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.day-circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: var(--color-primary-neon); /* Neon color for circles */
+    color: var(--color-background-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.selected-badge {
+    background-color: var(--color-primary-neon); /* Neon color for selected badge */
+    color: var(--color-background-dark);
+    padding: 5px 10px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.split-list-item .icon-button {
+  background: none;
+  border: none;
+  color: var(--color-highlight-subtle); /* Use subtle color for icons */
+  font-size: 20px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.split-list-item .icon-button:hover {
+  color: var(--color-primary-neon); /* Change to neon on hover */
+}
+
+/* Specific styling for delete icon */
+.split-list-item .icon-button.delete-button:hover {
+  color: var(--color-secondary-red); /* Red on hover for delete */
 }
