@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { MdClose, MdDelete } from 'react-icons/md';
+import WorkoutSummaryModal from './WorkoutSummaryModal';
 
 const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -12,28 +13,28 @@ const WorkoutLogger = ({ selectedSplit, onGoToHistory }) => {
   const [timerRunning, setTimerRunning] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [showRestTimer, setShowRestTimer] = useState(false);
-  const [currentDay, setCurrentDay] = useState(null);
+  const [showFinishModal, setShowFinishModal] = useState(false);
+  const [selectedDay, setSelectedDay] = useState(daysOfWeek[new Date().getDay()]); // <-- New state for selected day
+  const [currentDayData, setCurrentDayData] = useState(null);
 
-  // Get the current day of the week and filter exercises from the split
+  // Get the exercises for the selected day from the split
   useEffect(() => {
     if (selectedSplit && selectedSplit.days) {
-        const today = new Date();
-        const dayName = daysOfWeek[today.getDay()];
-        const dayData = selectedSplit.days.find(day => day.dayOfWeek === dayName);
+        const dayData = selectedSplit.days.find(day => day.dayOfWeek === selectedDay);
 
         if (dayData) {
-            setCurrentDay(dayData);
+            setCurrentDayData(dayData);
             const initialExercises = dayData.exercises.map(name => ({
                 name: name,
                 sets: [{ reps: '', weight: '', completed: false }]
             }));
             setCurrentWorkout({ exercises: initialExercises });
         } else {
-            setCurrentDay(null);
+            setCurrentDayData(null);
             setCurrentWorkout({ exercises: [] });
         }
     }
-  }, [selectedSplit]);
+  }, [selectedSplit, selectedDay]); // Re-initialize when split or selected day changes
 
   // Timer logic
   useEffect(() => {
@@ -56,10 +57,6 @@ const WorkoutLogger = ({ selectedSplit, onGoToHistory }) => {
 
   if (!selectedSplit) {
     return <div className="card" style={{ maxWidth: '600px', margin: '20px auto' }}><h2>Log a Workout</h2><p>Please select a split from the splits page to log a workout.</p></div>;
-  }
-
-  if (!currentDay) {
-      return <div className="card" style={{ maxWidth: '600px', margin: '20px auto' }}><h2>Log a Workout</h2><p>No workout is scheduled for today ({daysOfWeek[new Date().getDay()]}).</p></div>;
   }
 
   const handleAddSet = (exerciseIndex) => {
@@ -100,7 +97,29 @@ const WorkoutLogger = ({ selectedSplit, onGoToHistory }) => {
   };
 
   const handleSaveWorkout = async () => {
-    // Save logic here
+    if (!auth.currentUser) return;
+
+    const finishedExercises = currentWorkout.exercises.map(exercise => ({
+      ...exercise,
+      sets: exercise.sets.filter(set => set.reps || set.weight),
+    })).filter(exercise => exercise.sets.length > 0);
+
+    if (finishedExercises.length === 0) {
+        alert("Please log at least one set to finish the workout.");
+        return;
+    }
+
+    try {
+        await addDoc(collection(db, "workouts"), {
+            userId: auth.currentUser.uid,
+            date: serverTimestamp(),
+            exercises: finishedExercises,
+        });
+        setShowFinishModal(true);
+    } catch (e) {
+        console.error("Error finishing workout:", e);
+        alert("Failed to save workout. Check console.");
+    }
   };
 
   const formatTime = (timeInSeconds) => {
@@ -112,7 +131,22 @@ const WorkoutLogger = ({ selectedSplit, onGoToHistory }) => {
   return (
     <div className="card" style={{ maxWidth: '600px', margin: '20px auto' }}>
       <h2>Workout Logger</h2>
-      <h3>{selectedSplit.name} ({currentDay.name})</h3>
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <h3 style={{ margin: 0 }}>{selectedSplit.name}</h3>
+          <select value={selectedDay} onChange={(e) => setSelectedDay(e.target.value)} style={{ width: '150px' }}>
+              {selectedSplit.days.map((day, index) => (
+                  <option key={index} value={day.dayOfWeek}>{day.name} ({day.dayOfWeek})</option>
+              ))}
+          </select>
+      </div>
+
+      {!currentDayData && (
+          <div style={{ textAlign: 'center', marginTop: '20px' }}>
+              <p>No workout is scheduled for {selectedDay}.</p>
+              <p>Please select another day or check your split.</p>
+          </div>
+      )}
 
       {showRestTimer && (
           <div className="rest-timer-modal">
@@ -126,14 +160,14 @@ const WorkoutLogger = ({ selectedSplit, onGoToHistory }) => {
           </div>
       )}
 
-      {currentWorkout.exercises.map((exercise, exerciseIndex) => (
+      {currentDayData && currentWorkout.exercises.map((exercise, exerciseIndex) => (
         <div key={exerciseIndex} className="card" style={{ marginTop: '20px' }}>
           <h4>{exercise.name}</h4>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {exercise.sets.map((set, setIndex) => (
               <div key={setIndex} style={{ display: 'flex', gap: '15px', alignItems: 'center', backgroundColor: '#2b2b2b', padding: '10px', borderRadius: '8px' }}>
                 <input type="checkbox" checked={set.completed} onChange={() => handleToggleSetComplete(exerciseIndex, setIndex)} />
-                <input type="number" placeholder="Weight (lbs)" value={set.weight} onChange={(e) => handleUpdateSet(exerciseIndex, setIndex, 'weight', e.target.value)} style={{ flex: 1 }} /> {/* <-- Changed 'kg' to 'lbs' */}
+                <input type="number" placeholder="Weight (lbs)" value={set.weight} onChange={(e) => handleUpdateSet(exerciseIndex, setIndex, 'weight', e.target.value)} style={{ flex: 1 }} />
                 <input type="number" placeholder="Reps" value={set.reps} onChange={(e) => handleUpdateSet(exerciseIndex, setIndex, 'reps', e.target.value)} style={{ flex: 1 }} />
                 <button onClick={() => handleRemoveSet(exerciseIndex, setIndex)} className="icon-button delete-button"><MdDelete /></button>
               </div>
@@ -144,6 +178,13 @@ const WorkoutLogger = ({ selectedSplit, onGoToHistory }) => {
       ))}
       <button onClick={handleAddExercise}>Add Exercise</button>
       <button onClick={handleSaveWorkout}>Finish Workout</button>
+
+      <WorkoutSummaryModal
+        isOpen={showFinishModal}
+        onClose={() => setShowFinishModal(false)}
+        workout={currentWorkout}
+        onFinish={() => { setShowFinishModal(false); onGoToHistory(); }}
+      />
     </div>
   );
 };

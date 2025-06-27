@@ -6,20 +6,23 @@ import { auth, db } from './firebase';
 
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
-import WorkoutLogger from './components/WorkoutLogger';
+import WorkoutLogger from './components/WorkoutLogger'; // Renamed from WorkoutForm
 import ProfilePage from './components/ProfilePage';
 import HistoryPage from './components/HistoryPage';
 import RecordsPage from './components/RecordsPage';
 import ExercisesPage from './components/ExercisesPage';
 import StatisticsPage from './components/StatisticsPage';
-import WorkoutSplitPage from './components/WorkoutSplitPage'; // (Keep if used later)
+import WorkoutSplitPage from './components/WorkoutSplitPage'; // Keep this import if you plan to use this component later
 import SplitList from './components/SplitList';
 import SplitForm from './components/SplitForm';
 
 import { MdArrowBack } from 'react-icons/md';
 import './App.css';
 
-const NavBar = ({ currentPage, onGoBack, onSignOut }) => {
+// Import the script for populating exercises
+import { populateExercises } from './scripts/populateExercises'; 
+
+const NavBar = ({ currentPage, onGoBack }) => { // Removed onSignOut prop, as it's no longer used in NavBar
   const showBackButton = currentPage !== 'home';
 
   return (
@@ -32,7 +35,8 @@ const NavBar = ({ currentPage, onGoBack, onSignOut }) => {
         <div style={{ width: '50px' }}></div>
       )}
       <h1 className="app-title">FitTrack</h1>
-      <button onClick={onSignOut} className="icon-button">Sign Out</button>
+      {/* Sign Out button removed from NavBar, now only on Profile page */}
+      <div style={{ width: '50px' }}></div> {/* Spacer for alignment */}
     </nav>
   );
 };
@@ -56,6 +60,7 @@ function App() {
   useEffect(() => {
     const fetchSelectedSplit = async () => {
       if (user) {
+        // Query to get the selected split for the current user
         const q = query(
           collection(db, 'splits'),
           where('userId', '==', user.uid),
@@ -89,14 +94,16 @@ function App() {
     };
 
     if (!loading && user) {
-      fetchSelectedSplit();
+        fetchSelectedSplit();
     } else if (!loading && !user) {
-      setSelectedSplit(null);
+        setSelectedSplit(null);
     }
   }, [user, loading]);
 
   const handleSignOut = async () => {
     try {
+      // Call populateExercises here temporarily to run it once
+      // await populateExercises(); // UNCOMMENT THIS LINE TO RUN THE SCRIPT ONCE
       await signOut(auth);
       console.log('User signed out successfully!');
       setCurrentPage('home');
@@ -179,7 +186,7 @@ function App() {
         <NavBar
           currentPage={currentPage}
           onGoBack={handleGoBack}
-          onSignOut={handleSignOut}
+          // onSignOut is no longer passed to NavBar
         />
       </header>
       <main className="main-content">

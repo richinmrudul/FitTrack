@@ -21,7 +21,7 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
 );
 
 const ProgressCharts = () => {
@@ -42,7 +42,7 @@ const ProgressCharts = () => {
         const q = query(
           collection(db, 'workouts'),
           where('userId', '==', auth.currentUser.uid),
-          orderBy('date', 'asc') // Order by date ascending for the chart
+          orderBy('date', 'asc')
         );
         const querySnapshot = await getDocs(q);
 
@@ -58,30 +58,35 @@ const ProgressCharts = () => {
 
         setAvailableExercises(Array.from(exerciseNames));
 
-        // If no exercise is selected, select the first one
         const defaultExercise = selectedExercise || Array.from(exerciseNames)[0];
         if (defaultExercise) {
           setSelectedExercise(defaultExercise);
         }
 
-        // Prepare data for the chart based on the selected exercise
         if (defaultExercise) {
           const labels = workouts.map(w => w.date.toDate().toLocaleDateString());
           const dataPoints = workouts.map(w => {
-            const ex = w.exercises.find(e => e.name === defaultExercise);
-            return ex ? parseFloat(ex.weight) : null;
+            // Find the specific exercise in the workout
+            const exerciseData = w.exercises.find(e => e.name === defaultExercise);
+
+            if (exerciseData && exerciseData.sets) {
+                // Find the max weight for that exercise from all its sets
+                const maxWeight = Math.max(...exerciseData.sets.map(set => parseFloat(set.weight) || 0));
+                return maxWeight > 0 ? maxWeight : null;
+            }
+            return null;
           });
 
           setChartData({
             labels,
             datasets: [
               {
-                label: `${defaultExercise} Weight (kg)`,
+                label: `${defaultExercise} Weight (lbs)`,
                 data: dataPoints,
                 borderColor: 'rgb(75, 192, 192)',
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                 tension: 0.1,
-                spanGaps: true, // Connects data points across null values
+                spanGaps: true,
               },
             ],
           });
@@ -95,7 +100,7 @@ const ProgressCharts = () => {
     };
 
     fetchChartData();
-  }, [selectedExercise, auth.currentUser]); // Re-fetch when user or selected exercise changes
+  }, [selectedExercise, auth.currentUser]);
 
   if (loading) {
     return <p>Loading chart data...</p>;
@@ -120,7 +125,7 @@ const ProgressCharts = () => {
         y: {
             title: {
                 display: true,
-                text: 'Weight (kg)'
+                text: 'Weight (lbs)'
             }
         }
     }

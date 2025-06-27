@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MdClose, MdDelete, MdArrowUpward, MdArrowDownward } from 'react-icons/md';
+import { collection, addDoc } from 'firebase/firestore';
+import { db, auth } from '../firebase';
 
 const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -8,25 +10,26 @@ const DayModal = ({ isOpen, onClose, dayData, onSave }) => {
   const [dayOfWeek, setDayOfWeek] = useState(daysOfWeek[0]);
   const [exercises, setExercises] = useState([]);
   const [newExercise, setNewExercise] = useState('');
+  const [newExerciseCategory, setNewExerciseCategory] = useState('chest');
+
+  const categories = ['chest', 'back', 'legs', 'arms', 'shoulders', 'core', 'cardio', 'all'];
 
   useEffect(() => {
     if (dayData) {
-      // Editing existing day: pre-fill the form
       setDayName(dayData.name || '');
       setDayOfWeek(dayData.dayOfWeek || daysOfWeek[0]);
-      setExercises(dayData.exercises || []);
+      setExercises(dayData.exercises.map(name => ({ name, category: 'all' }))); // Assuming 'all' if category is not saved
     } else {
-      // Creating new day: reset the form
       setDayName('');
       setDayOfWeek(daysOfWeek[0]);
       setExercises([]);
     }
-  }, [dayData, isOpen]); // Reset state when modal opens or dayData changes
+  }, [dayData, isOpen]);
 
   const handleAddExercise = (e) => {
     if (e) e.preventDefault();
     if (newExercise.trim()) {
-      setExercises([...exercises, newExercise]);
+      setExercises([...exercises, { name: newExercise, category: newExerciseCategory }]);
       setNewExercise('');
     }
   };
@@ -47,12 +50,25 @@ const DayModal = ({ isOpen, onClose, dayData, onSave }) => {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!dayName) {
       alert("Please enter a name for the day.");
       return;
     }
-    onSave({ name: dayName, dayOfWeek: dayOfWeek, exercises: exercises });
+
+    const exercisesToAdd = exercises.filter(ex => !ex.id);
+    if (exercisesToAdd.length > 0 && auth.currentUser) {
+        for (const exercise of exercisesToAdd) {
+            await addDoc(collection(db, 'exercises'), {
+                userId: auth.currentUser.uid,
+                name: exercise.name,
+                category: exercise.category,
+            });
+        }
+        alert(`${exercisesToAdd.length} new exercises added to your list!`);
+    }
+
+    onSave({ name: dayName, dayOfWeek: dayOfWeek, exercises: exercises.map(ex => ex.name) });
     onClose();
   };
 
@@ -89,13 +105,16 @@ const DayModal = ({ isOpen, onClose, dayData, onSave }) => {
 
         <form onSubmit={handleAddExercise} style={{ display: 'flex', gap: '10px' }}>
           <input type="text" placeholder="Add new exercise" value={newExercise} onChange={(e) => setNewExercise(e.target.value)} style={{ flexGrow: 1 }} />
+          <select value={newExerciseCategory} onChange={(e) => setNewExerciseCategory(e.target.value)} style={{ width: '120px' }}>
+              {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+          </select>
           <button type="submit" style={{ minWidth: '80px' }}>Add</button>
         </form>
 
         <ul style={{ listStyleType: 'none', padding: 0, margin: 0, maxHeight: '150px', overflowY: 'auto' }}>
           {exercises.map((exercise, index) => (
             <li key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px', borderBottom: '1px solid var(--color-border-subtle)' }}>
-              <span>{exercise}</span>
+              <span>{exercise.name || exercise} ({exercise.category || 'N/A'})</span>
               <div style={{ display: 'flex', gap: '5px' }}>
                   <button onClick={() => handleMove(index, 'up')} style={{ border: 'none', background: 'none', color: 'var(--color-text-light)', padding: '0' }}><MdArrowUpward /></button>
                   <button onClick={() => handleMove(index, 'down')} style={{ border: 'none', background: 'none', color: 'var(--color-text-light)', padding: '0' }}><MdArrowDownward /></button>
