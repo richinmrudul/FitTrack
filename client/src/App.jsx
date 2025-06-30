@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { onAuthStateChanged, signOut } from 'firebase/auth'; // <-- Corrected import
-import { collection, query, where, getDoc, getDocs, setDoc, doc } from 'firebase/firestore'; // <-- Corrected import
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { collection, query, where, getDoc, getDocs, setDoc, doc } from 'firebase/firestore'; 
 
 import { auth, db } from './firebase';
 
@@ -12,14 +12,15 @@ import HistoryPage from './components/HistoryPage';
 import RecordsPage from './components/RecordsPage';
 import ExercisesPage from './components/ExercisesPage';
 import StatisticsPage from './components/StatisticsPage';
-import WorkoutSplitPage from './components/WorkoutSplitPage';
+import WorkoutSplitPage from './components/WorkoutSplitPage'; 
 import SplitList from './components/SplitList';
 import SplitForm from './components/SplitForm';
+import AISplitGenerator from './components/AISplitGenerator'; // <-- ADD THIS IMPORT
 
 import { MdArrowBack } from 'react-icons/md';
 import './App.css';
 
-// A simple header with navigation links
+// NavBar component
 const NavBar = ({ currentPage, onGoBack }) => {
   const showBackButton = currentPage !== 'home';
 
@@ -38,10 +39,10 @@ const NavBar = ({ currentPage, onGoBack }) => {
   );
 };
 
-// New Onboarding Form component
+// Onboarding Form component (defined here as it's only used in App.jsx's render logic)
 const OnboardingForm = ({ user, onFinishOnboarding }) => {
-    const [heightFt, setHeightFt] = useState(''); // <-- Added useState
-    const [heightIn, setHeightIn] = useState(''); // <-- Added useState
+    const [heightFt, setHeightFt] = useState(''); 
+    const [heightIn, setHeightIn] = useState(''); 
     const [weight, setWeight] = useState('');
     const [age, setAge] = useState('');
     const [gender, setGender] = useState('male');
@@ -53,7 +54,6 @@ const OnboardingForm = ({ user, onFinishOnboarding }) => {
         e.preventDefault();
         setLoading(true);
 
-        // Convert height from ft/in to cm for consistent storage
         const totalInches = (parseInt(heightFt) * 12) + parseInt(heightIn);
         const heightInCm = totalInches * 2.54;
 
@@ -144,17 +144,21 @@ function App() {
   useEffect(() => {
       const checkOnboardingStatus = async () => {
           if (user) {
-              const docRef = doc(db, "users", user.uid);
-              const docSnap = await getDoc(docRef);
-              if (docSnap.exists()) {
-                  setIsOnboarded(docSnap.data().onboarded);
+              const userDocRef = doc(db, "users", user.uid);
+              const userDocSnap = await getDoc(userDocRef);
+              if (userDocSnap.exists()) {
+                  setIsOnboarded(userDocSnap.data().onboarded);
               } else {
                   setIsOnboarded(false);
               }
           }
       };
-      checkOnboardingStatus();
-  }, [user]);
+      if (!loading && user) {
+        checkOnboardingStatus();
+      } else if (!loading && !user) {
+        setIsOnboarded(false);
+      }
+  }, [user, loading]);
 
   useEffect(() => {
     const fetchSelectedSplit = async () => {
@@ -190,18 +194,20 @@ function App() {
       }
     };
 
-    if (!loading && user) {
+    if (!loading && user && isOnboarded) {
         fetchSelectedSplit();
     } else if (!loading && !user) {
         setSelectedSplit(null);
     }
-  }, [user, loading]);
+  }, [user, loading, isOnboarded]);
 
   const handleSignOut = async () => {
     try {
       await signOut(auth);
       console.log('User signed out successfully!');
       setCurrentPage('home');
+      setIsOnboarded(false);
+      setSelectedSplit(null);
     } catch (error) {
       console.error('Error during sign out:', error.message);
     }
@@ -229,7 +235,12 @@ function App() {
   };
 
   if (loading) {
-    return <div className="App">Loading...</div>;
+    return (
+        <div className="App">
+            <h1 className="app-title">FitTrack</h1>
+            <p>Loading app...</p>
+        </div>
+    );
   }
 
   if (!user) {
@@ -278,6 +289,8 @@ function App() {
         return <SplitForm split={selectedSplit} onGoBack={handleGoBack} />;
       case 'profile':
         return <ProfilePage user={user} onSignOut={handleSignOut} />;
+      case 'ai-split': // <-- ADDED THIS CASE
+        return <AISplitGenerator user={user} onSetPage={handleSetPage} />; // <-- RENDER THE COMPONENT
       default:
         return <Dashboard user={user} onSetPage={handleSetPage} />;
     }
