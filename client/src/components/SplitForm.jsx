@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { collection, addDoc, doc, updateDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { MdOutlineAdd, MdDelete, MdEdit } from 'react-icons/md';
-import DayModal from './DayModal'; // <-- Import the new consolidated modal
+import DayModal from './DayModal'; 
 
 const SplitForm = ({ split, onGoBack }) => {
   const [splitName, setSplitName] = useState('');
   const [customDays, setCustomDays] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false); // <-- Single modal state
+  const [isModalOpen, setIsModalOpen] = useState(false); 
   const [selectedDayIndex, setSelectedDayIndex] = useState(null);
 
   useEffect(() => {

@@ -15,7 +15,7 @@ import StatisticsPage from './components/StatisticsPage';
 import WorkoutSplitPage from './components/WorkoutSplitPage'; 
 import SplitList from './components/SplitList';
 import SplitForm from './components/SplitForm';
-import AISplitGenerator from './components/AISplitGenerator'; // <-- ADD THIS IMPORT
+import AISplitGenerator from './components/AISplitGenerator'; 
 
 import { MdArrowBack } from 'react-icons/md';
 import './App.css';
@@ -39,7 +39,7 @@ const NavBar = ({ currentPage, onGoBack }) => {
   );
 };
 
-// Onboarding Form component (defined here as it's only used in App.jsx's render logic)
+// Onboarding Form component 
 const OnboardingForm = ({ user, onFinishOnboarding }) => {
     const [heightFt, setHeightFt] = useState(''); 
     const [heightIn, setHeightIn] = useState(''); 

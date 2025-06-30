@@ -17,7 +17,7 @@ const QuickActions = ({ onSetPage }) => {
     <div className="grid-container">
       {actions.map((action) => (
         <div key={action.name} className="grid-item" onClick={() => {
-          console.log("Clicked on:", action.name, "setting page to:", action.page); // <-- ADD THIS LINE
+          console.log("Clicked on:", action.name, "setting page to:", action.page); 
           onSetPage(action.page);
         }}>
           <span className="icon">{action.icon}</span>

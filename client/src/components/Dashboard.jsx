@@ -43,7 +43,7 @@ const Dashboard = ({ user, onSetPage }) => {
         });
 
         return () => unsubscribe();
-    }, [user, selectedDate]); // Re-fetch when user or selectedDate changes
+    }, [user, selectedDate]); 
 
     // Tile content for the calendar (adds a dot on workout days)
     const tileContent = ({ date, view }) => {
@@ -71,7 +71,7 @@ const Dashboard = ({ user, onSetPage }) => {
                 <div className="card calendar-card" style={{ flexGrow: 1, minWidth: '350px' }}>
                     <h3>Workout Calendar</h3>
                     <Calendar
-                        onChange={setSelectedDate} // Update state on date click
+                        onChange={setSelectedDate} 
                         value={selectedDate}
                         tileContent={tileContent}
                         className="react-calendar"

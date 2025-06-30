@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MdCheck } from 'react-icons/md';
-import { doc, getDoc, collection, addDoc } from 'firebase/firestore'; // Import necessary Firestore functions
-import { db, auth } from '../firebase'; // Import db and auth
+import { doc, getDoc, collection, addDoc } from 'firebase/firestore'; 
+import { db, auth } from '../firebase'; 
 
 const AISplitGenerator = ({ user, onSetPage }) => {
   const [generatedSplit, setGeneratedSplit] = useState(null);
@@ -33,15 +33,15 @@ const AISplitGenerator = ({ user, onSetPage }) => {
     setGeneratedSplit(null);
     setError(null);
 
-    // Your deployed Firebase Function URL
-    const FUNCTION_URL = "https://generateworkoutsplit-xyxgaybga-uc.a.run.app"; // <-- REPLACE WITH YOUR ACTUAL FUNCTION URL
+    
+    const FUNCTION_URL = "https://generateworkoutsplit-xyxgaybga-uc.a.run.app"; 
 
     const payload = {
       goal: profileData.goal,
       frequency: profileData.workoutFrequency,
       gender: profileData.gender,
       currentWeight: profileData.weight,
-      workoutDays: 7 // Always generate a 7-day split for now
+      workoutDays: 7 
     };
 
     try {
@@ -76,16 +76,16 @@ const AISplitGenerator = ({ user, onSetPage }) => {
         await addDoc(collection(db, "splits"), {
             userId: auth.currentUser.uid,
             name: `AI Generated Split - ${new Date().toLocaleDateString()}`,
-            days: generatedSplit.map(day => ({ // Ensure exercises are saved as strings
+            days: generatedSplit.map(day => ({ 
                 name: day.name,
                 dayOfWeek: day.dayOfWeek,
-                exercises: day.exercises.map(ex => String(ex)) // Ensure exercises are strings
+                exercises: day.exercises.map(ex => String(ex)) 
             })),
             generatedByAI: true,
-            selected: false // Don't auto-select
+            selected: false 
         });
         alert("AI Split saved successfully!");
-        onSetPage('split'); // Go to split list after saving
+        onSetPage('split'); 
     } catch (error) {
         console.error("Error saving AI split:", error);
         alert("Failed to save AI split.");

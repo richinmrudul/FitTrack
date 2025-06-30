@@ -8,15 +8,15 @@ require('dotenv').config();
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-// Configure CORS with specific origins. Add your localhost and future deployed URLs here.
+// Configure CORS with specific origins. This must include your Vercel URL.
 const allowedOrigins = [
     'http://localhost:5173', // Your React app's local development URL
-    // 'https://your-deployed-app.vercel.app' // Add your Vercel URL here after deployment
+    'https://fit-track-liart.vercel.app' // YOUR DEPLOYED VERCEL URL IS HERE
 ];
 
 const corsOptions = {
     origin: function (origin, callback) {
-        if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+        if (allowedOrigins.includes(origin) || !origin) { // Use .includes for array check
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS'));

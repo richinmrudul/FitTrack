@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore'; // <-- Add orderBy for consistent sorting
+import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore'; 
 import { db, auth } from '../firebase';
 
 const RecordsPage = () => {

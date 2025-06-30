@@ -1,8 +1,8 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom'; // <-- Use NavLink
+import { NavLink } from 'react-router-dom'; 
 
 const BottomNav = () => {
-  // isActive is provided by NavLink to apply a style to the active link
+  
   const activeStyle = ({ isActive }) => ({
     color: isActive ? 'var(--color-highlight-neon)' : 'var(--color-text-light)',
   });

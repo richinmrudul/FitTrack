@@ -1,7 +1,7 @@
 import React from 'react';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '../firebase';
-import { MdFitnessCenter } from 'react-icons/md'; // Import an icon
+import { MdFitnessCenter } from 'react-icons/md'; 
 
 const Login = () => {
   const signInWithGoogle = async () => {
@@ -20,7 +20,7 @@ const Login = () => {
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      minHeight: '80vh', // Take up most of the viewport height
+      minHeight: '80vh', 
       textAlign: 'center',
       padding: '20px',
     }}>
@@ -30,7 +30,7 @@ const Login = () => {
       <button onClick={signInWithGoogle} style={{
         padding: '15px 30px',
         fontSize: '18px',
-        borderRadius: '50px', // More rounded button
+        borderRadius: '50px', 
         backgroundColor: 'var(--color-primary-neon)',
         color: 'var(--color-background-dark)',
         border: 'none',

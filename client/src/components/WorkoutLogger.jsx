@@ -14,7 +14,7 @@ const WorkoutLogger = ({ selectedSplit, onGoToHistory }) => {
   const [seconds, setSeconds] = useState(0);
   const [showRestTimer, setShowRestTimer] = useState(false);
   const [showFinishModal, setShowFinishModal] = useState(false);
-  const [selectedDay, setSelectedDay] = useState(daysOfWeek[new Date().getDay()]); // <-- New state for selected day
+  const [selectedDay, setSelectedDay] = useState(daysOfWeek[new Date().getDay()]); 
   const [currentDayData, setCurrentDayData] = useState(null);
 
   // Get the exercises for the selected day from the split
@@ -34,7 +34,7 @@ const WorkoutLogger = ({ selectedSplit, onGoToHistory }) => {
             setCurrentWorkout({ exercises: [] });
         }
     }
-  }, [selectedSplit, selectedDay]); // Re-initialize when split or selected day changes
+  }, [selectedSplit, selectedDay]); 
 
   // Timer logic
   useEffect(() => {

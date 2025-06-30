@@ -11,7 +11,7 @@ const ExercisesPage = () => {
     const muscleGroups = [
         { name: 'Chest', icon: <MdFitnessCenter />, category: 'chest' },
         { name: 'Back', icon: <MdFitnessCenterOutline />, category: 'back' },
-        { name: 'Legs', icon: <MdOutlineRunCircle />, category: 'legs' }, // <-- Replaced with a run icon
+        { name: 'Legs', icon: <MdOutlineRunCircle />, category: 'legs' }, 
         { name: 'Arms', icon: <MdOutlineSportsGymnastics />, category: 'arms' },
         { name: 'Shoulders', icon: <MdOutlineSportsGymnastics />, category: 'shoulders' },
         { name: 'Core', icon: <MdOutlineSportsGymnastics />, category: 'core' },
