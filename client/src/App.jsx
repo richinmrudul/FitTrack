@@ -12,16 +12,14 @@ import HistoryPage from './components/HistoryPage';
 import RecordsPage from './components/RecordsPage';
 import ExercisesPage from './components/ExercisesPage';
 import StatisticsPage from './components/StatisticsPage';
-import WorkoutSplitPage from './components/WorkoutSplitPage'; 
 import SplitList from './components/SplitList';
 import SplitForm from './components/SplitForm';
-import AISplitGenerator from './components/AISplitGenerator'; 
 
 import { MdArrowBack } from 'react-icons/md';
 import './App.css';
 
-// NavBar component
-const NavBar = ({ currentPage, onGoBack }) => {
+// NavBar component (re-typed for syntax fix)
+const NavBar = ({ currentPage, onGoBack }) => { 
   const showBackButton = currentPage !== 'home';
 
   return (
@@ -31,18 +29,19 @@ const NavBar = ({ currentPage, onGoBack }) => {
           <MdArrowBack />
         </button>
       ) : (
-        <div style={{ width: '50px' }}></div>
+        <div style={{ width: '50px' }}></div> 
       )}
       <h1 className="app-title">FitTrack</h1>
-      <div style={{ width: '50px' }}></div>
+      <div style={{ width: '50px' }}></div> 
     </nav>
   );
 };
 
-// Onboarding Form component 
+
+// Onboarding Form component (defined here for simplicity, best practice is separate file)
 const OnboardingForm = ({ user, onFinishOnboarding }) => {
-    const [heightFt, setHeightFt] = useState(''); 
-    const [heightIn, setHeightIn] = useState(''); 
+    const [heightFt, setHeightFt] = useState('');
+    const [heightIn, setHeightIn] = useState('');
     const [weight, setWeight] = useState('');
     const [age, setAge] = useState('');
     const [gender, setGender] = useState('male');
@@ -145,20 +144,21 @@ function App() {
       const checkOnboardingStatus = async () => {
           if (user) {
               const userDocRef = doc(db, "users", user.uid);
-              const userDocSnap = await getDoc(userDocRef);
+              const userDocSnap = await getDoc(userDocRef); 
               if (userDocSnap.exists()) {
-                  setIsOnboarded(userDocSnap.data().onboarded);
+                  setIsOnboarded(userDocSnap.data().onboarded || false); 
               } else {
                   setIsOnboarded(false);
               }
           }
       };
-      if (!loading && user) {
+      if (!loading && user) { 
         checkOnboardingStatus();
-      } else if (!loading && !user) {
-        setIsOnboarded(false);
+      } else if (!loading && !user) { 
+        setIsOnboarded(false); 
       }
   }, [user, loading]);
+
 
   useEffect(() => {
     const fetchSelectedSplit = async () => {
@@ -194,12 +194,19 @@ function App() {
       }
     };
 
-    if (!loading && user && isOnboarded) {
+    if (!loading && user && isOnboarded) { 
         fetchSelectedSplit();
     } else if (!loading && !user) {
         setSelectedSplit(null);
     }
   }, [user, loading, isOnboarded]);
+
+  useEffect(() => {
+      if (user && isOnboarded) { 
+          // populateExercises(user); // COMMENTED OUT
+      }
+  }, [user, isOnboarded]); 
+
 
   const handleSignOut = async () => {
     try {
@@ -289,8 +296,6 @@ function App() {
         return <SplitForm split={selectedSplit} onGoBack={handleGoBack} />;
       case 'profile':
         return <ProfilePage user={user} onSignOut={handleSignOut} />;
-      case 'ai-split': // <-- ADDED THIS CASE
-        return <AISplitGenerator user={user} onSetPage={handleSetPage} />; // <-- RENDER THE COMPONENT
       default:
         return <Dashboard user={user} onSetPage={handleSetPage} />;
     }
@@ -302,7 +307,6 @@ function App() {
         <NavBar
           currentPage={currentPage}
           onGoBack={handleGoBack}
-          onSignOut={handleSignOut}
         />
       </header>
       <main className="main-content">
