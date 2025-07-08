@@ -1,6 +1,5 @@
 import React from 'react';
-// MdSmartToy is removed from the import list
-import { MdHistory, MdBarChart, MdPerson, MdEdit, MdFitnessCenter, MdOutlineLeaderboard, MdTrendingUp, MdCalendarToday } from 'react-icons/md'; 
+import { MdHistory, MdBarChart, MdPerson, MdEdit, MdFitnessCenter, MdOutlineLeaderboard, MdTrendingUp, MdCalendarToday, MdSmartToy } from 'react-icons/md'; 
 
 const QuickActions = ({ onSetPage }) => {
   const actions = [
@@ -10,7 +9,7 @@ const QuickActions = ({ onSetPage }) => {
     { name: 'Workout Split', icon: <MdCalendarToday />, page: 'split' },
     { name: 'Exercises', icon: <MdEdit />, page: 'exercises' },
     { name: 'Statistics', icon: <MdTrendingUp />, page: 'statistics' },
-    // The 'AI Split' action is removed from here
+    { name: 'AI Split', icon: <MdSmartToy />, page: 'chatgpt-split' }, // Changed name
     { name: 'Profile', icon: <MdPerson />, page: 'profile' },
   ];
 

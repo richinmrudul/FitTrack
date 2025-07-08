@@ -12,13 +12,18 @@ import HistoryPage from './components/HistoryPage';
 import RecordsPage from './components/RecordsPage';
 import ExercisesPage from './components/ExercisesPage';
 import StatisticsPage from './components/StatisticsPage';
+// Removed unused import: import WorkoutSplitPage from './components/WorkoutSplitPage'; 
 import SplitList from './components/SplitList';
 import SplitForm from './components/SplitForm';
+import ChatGPTSplitGenerator from './components/ChatGPTSplitGenerator'; // <-- ADD THIS IMPORT
 
 import { MdArrowBack } from 'react-icons/md';
 import './App.css';
 
-// NavBar component (re-typed for syntax fix)
+// Import the script for populating exercises (ensure this is commented out after first run)
+// import { populateExercises } from './scripts/populateExercises'; 
+
+// NavBar component (no onSignOut prop, as button is removed from NavBar)
 const NavBar = ({ currentPage, onGoBack }) => { 
   const showBackButton = currentPage !== 'home';
 
@@ -32,6 +37,7 @@ const NavBar = ({ currentPage, onGoBack }) => {
         <div style={{ width: '50px' }}></div> 
       )}
       <h1 className="app-title">FitTrack</h1>
+      {/* The Sign Out button is now only on the Profile page */}
       <div style={{ width: '50px' }}></div> 
     </nav>
   );
@@ -213,8 +219,8 @@ function App() {
       await signOut(auth);
       console.log('User signed out successfully!');
       setCurrentPage('home');
-      setIsOnboarded(false);
-      setSelectedSplit(null);
+      setIsOnboarded(false); 
+      setSelectedSplit(null); 
     } catch (error) {
       console.error('Error during sign out:', error.message);
     }
@@ -296,6 +302,8 @@ function App() {
         return <SplitForm split={selectedSplit} onGoBack={handleGoBack} />;
       case 'profile':
         return <ProfilePage user={user} onSignOut={handleSignOut} />;
+      case 'chatgpt-split': // <-- ADD THIS CASE
+        return <ChatGPTSplitGenerator user={user} onSetPage={handleSetPage} />; // <-- RENDER THE COMPONENT
       default:
         return <Dashboard user={user} onSetPage={handleSetPage} />;
     }
