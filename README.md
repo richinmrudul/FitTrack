@@ -1,51 +1,66 @@
-# 🏋️‍♂️ FitTrack: Smart Workout Tracker Web App 
+# FitTrack: Smart Workout Tracker Web App
 
-A full-stack web application designed to help users track their daily workouts, log exercises with detailed sets, reps, and weight, and visualize their progress over time. Features a clean, intuitive user interface and robust data management, now powered by AI!
-
----
-
-## ✨ Key Features
-
-* **Google OAuth Login:** Secure user authentication using Google accounts.
-* **Personalized Profile:** Users complete an onboarding form (height, weight, age, gender, frequency, goal) and view their personal data on a dedicated profile page.
-* **Workout Logging:** Intuitive interface to log daily workout sessions.
-    * Automatically shows exercises for the current day from the selected split.
-    * Includes a **3-minute auto-starting, dismissible rest timer**.
-    * Allows adding/removing sets with weight (lbs) and reps.
-    * Input validation for sets.
-* **Workout History:** View and delete past workout sessions with detailed set information.
-* **Personal Records (PR) Tracker:** Automatically calculates and displays the highest weight lifted for each exercise.
-* **Progress Charts:** Visual line charts to track weight progression over time for individual exercises.
-* **Workout Split Management:**
-    * Create and manage custom weekly workout splits (e.g., Push/Pull/Legs).
-    * Ability to define custom day names and assign actual days of the week.
-    * Edit/reorder/delete exercises for each day via an intuitive modal interface.
-    * Select an active split to be used in the workout logger.
-* **Exercise Manager:** Categorized list of exercises (Chest, Back, Legs, etc.) with ability to add and delete custom exercises.
-* **🧠 AI-Powered Personalized Split Generator:** Integrates with ChatGPT to generate a custom 7-day workout split based on the user's profile data (goal, frequency, gender, weight). This demonstrates advanced AI integration for personalized fitness recommendations.
+**FitTrack** is a full-stack web application that helps users log their daily workouts, track exercise performance over time, and manage their workout routines efficiently. With features like detailed set tracking, visual progress charts, and AI-powered workout planning, FitTrack offers a comprehensive solution for personal fitness management.
 
 ---
 
-## 🚀 Live Demo
+## Key Features
 
-Explore the deployed application here: [https://fit-track-black.vercel.app/](https://fit-track-black.vercel.app/)
+- **Google OAuth Authentication**  
+  Secure login using Google accounts to ensure safe and personalized access.
+
+- **User Profile & Onboarding**  
+  After signing in, users complete a brief onboarding form (including height, weight, age, gender, workout frequency, and fitness goals). This data is used throughout the app to personalize the experience.
+
+- **Workout Logging**  
+  Users can log daily workout sessions with:
+  - Exercises automatically populated based on their selected workout split.
+  - A built-in 3-minute rest timer that auto-starts and can be dismissed.
+  - Ability to add and remove sets, including reps and weight.
+  - Real-time input validation to prevent incorrect or incomplete data.
+
+- **Workout History**  
+  A complete view of past sessions, with the ability to delete entries and review all set details.
+
+- **Personal Records Tracker**  
+  Automatically calculates and displays each user’s highest recorded weight for every exercise.
+
+- **Progress Visualization**  
+  Generates line charts that show weight progression over time for individual exercises, helping users stay motivated and informed.
+
+- **Workout Split Management**  
+  Users can create and manage weekly workout splits, including:
+  - Custom day names and corresponding weekdays.
+  - Editable exercises for each day.
+  - Reordering, editing, and deleting splits through a user-friendly modal interface.
+  - Selecting an active split to power the daily workout experience.
+
+- **Exercise Management**  
+  Browse, add, or delete exercises organized by muscle group (Chest, Back, Legs, etc.). Supports both predefined and custom exercises.
+
+- **AI-Powered Workout Split Generator**  
+  Integrates with ChatGPT via a secure Firebase Cloud Function to generate a personalized 7-day workout split. The split is based on the user’s profile data, including fitness goals, training frequency, gender, and weight.
 
 ---
 
-## 🛠️ Tech Stack
+## Live Demo
 
-* **Frontend:** React.js (Vite), React Hooks, `react-icons`, `react-calendar`, `chart.js` (`react-chartjs-2`).
-* **Backend & Database:** Google Firebase (Firestore, Authentication, **Cloud Functions**).
-* **AI Integration:** **OpenAI (ChatGPT API)** via Firebase Cloud Functions.
-* **Development:** Git, npm, Visual Studio Code.
-* **Deployment:** Vercel.
+View the live application at: [https://fit-track-black.vercel.app/](https://fit-track-black.vercel.app/)
 
 ---
 
-## 💡 Next Steps / Future Enhancements
+## Technology Stack
 
-* Implement adaptive workout progression logic based on historical performance.
-* Add social features like workout sharing and friend tracking.
-* Expand detailed statistics and progress visualizations.
+- **Frontend**: React (Vite), React Hooks, Chart.js (via react-chartjs-2), React Calendar, React Icons  
+- **Backend**: Firebase (Authentication, Firestore, Cloud Functions)  
+- **AI Integration**: OpenAI’s ChatGPT API, accessed securely via Firebase Cloud Functions  
+- **Development Tools**: Git, npm, Visual Studio Code  
+- **Deployment**: Vercel
 
 ---
+
+## Future Improvements
+
+- Add adaptive workout progression based on past performance.
+- Introduce social features like friend connections or workout sharing.
+- Expand visualizations with more detailed progress tracking and advanced analytics.
